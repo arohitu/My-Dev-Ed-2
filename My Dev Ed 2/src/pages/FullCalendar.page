@@ -1,0 +1,162 @@
+<apex:page controller="CalendarExample_Controller" action="{!pageLoad}">
+<html>
+<head>
+<meta charset='utf-8' />
+
+<apex:stylesheet value="{!URLFOR($Resource.FullCalendar, '/fullcalendar.css')}"/>
+<link href="{!URLFOR($Resource.FullCalendar, '/fullcalendar.print.css')}" rel="stylesheet" media="print" />
+<apex:includeScript value="{!URLFOR($Resource.FullCalendar, '/lib/moment.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.FullCalendar, '/lib/jquery.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.FullCalendar, '/fullcalendar.min.js')}"/>
+
+    <script>
+    
+    $(document).ready(function() {
+        
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,today,next',
+                center: 'title',
+                right: 'month,basicWeek,basicDay'
+            },
+            defaultView: 'basicWeek',
+            defaultDate: '{!today}',
+            editable: true,
+            eventLimit: true, // allow "more" link when too many events
+            events: [
+                <apex:repeat value="{!events}" var="e">
+                        {
+                            title: "{!e.title}",
+                            start: '{!e.startString}',
+                            end: '{!e.endString}',
+
+                            allDay: {!e.allDay},
+                            className: '{!e.className}'
+                        },
+
+                    </apex:repeat>
+            ],
+            eventClick: function(calEvent, jsEvent, view) {
+                $("#startTime").html(moment(calEvent.start).format('MMM Do h:mm A'));
+                $("#endTime").html(moment(calEvent.end).format('MMM Do h:mm A'));
+                $("#eventInfo").html(calEvent.description);
+                $("#eventTitle").html(calEvent.title);
+                $("#eventLink").attr('href', calEvent.url);
+                $("#eventContent").css( {position:"absolute", top:jsEvent.pageY, left: jsEvent.pageX});
+                $("#eventContent").show();
+            }   
+        });
+        $( ".close" ).click(function() {
+            $("#eventContent").hide();
+        });
+        
+    });
+
+</script>
+<style>
+
+        #cal-options {float:left;}
+
+        #cal-legend { float:right;}
+
+        #cal-legend ul {margin:0;padding:0;list-style:none;}
+
+        #cal-legend ul li {margin:0;padding:5px;float:left;}
+
+        #cal-legend ul li span {display:block; height:16px; width:16px; margin-right:4px; float:left; border-radius:4px;}
+
+        #calendar {margin-top:20px;}
+
+        #calendar a:hover {color:#fff !important;}
+
+        
+
+        .fc-event-inner {padding:3px;}
+
+        .event-rohit        {background:#56458c;border-color:#56458c;}
+        .event-rohit-others {background:#FB05EB;border-color:#FB05EB;}
+        .event-janet        {background:#F8D629;border-color:#F8D629;}
+        .event-janet-others {background:#149616;border-color:#149616;}
+        
+        .box {border:2px solid #606061;background:#606061;}
+.box h2 {background:#606061;color:white;text-decoration:bold;}
+.box p {color:white;padding:10px;}
+.box {
+    -moz-border-radius-topright:5px;
+    -moz-border-radius-topleft:5px;
+    -webkit-border-top-right-radius:5px;
+    -webkit-border-top-left-radius:5px;
+}
+.close {
+        background: #606061;
+        color: #FFFFFF;
+        line-height: 25px;
+        position: absolute;
+        right: -12px;
+        text-align: center;
+        top: -10px;
+        width: 24px;
+        text-decoration: none;
+        font-weight: bold;
+        -webkit-border-radius: 12px;
+        -moz-border-radius: 12px;
+        border-radius: 12px;
+        -moz-box-shadow: 1px 1px 3px #000;
+        -webkit-box-shadow: 1px 1px 3px #000;
+        box-shadow: 1px 1px 3px #000;
+    }
+
+    .close:hover { background: #00d9ff; }
+
+
+    </style>
+</head>
+<body>
+
+    <apex:outputPanel id="calPanel">
+
+        <apex:form >
+
+            <div id="cal-options">
+
+                <!--<apex:commandButton value="{!IF(includeMyEvents,'Hide My Events','Show My Events')}" action="{!toggleMyEvents}" reRender="calPanel"/>-->
+
+            </div>
+
+            <div id="cal-legend">
+
+                <ul>
+
+                    <li><span class="event-rohit"></span>Rohit (Self)</li>
+                    <li><span class="event-rohit-others"></span>Rohit (Others)</li>
+                    <li><span class="event-janet"></span>Janet (Self)</li>
+                    <li><span class="event-janet-others"></span>Janet (Others)</li>
+
+
+                    <!--<li style="{!IF(includeMyEvents,'','display:none')}"><span class="event-personal"></span>My Events</li>-->
+
+                </ul>
+
+                <div style="clear:both;"><!--fix floats--></div>
+
+            </div> 
+
+            <div style="clear:both;"><!--fix floats--></div>
+            <div id="eventContent" title="Event Details" style="display:none; z-index: 1000; ">
+                    <div class="box">
+                        <h2><span id="eventTitle"></span><a href="#close" title="Close" class="close" style="text-decoration:none;">X</a><br/></h2>
+                        <p>Start: <span id="startTime"></span><br/></p>
+                        <p>End: <span id="endTime"></span><br/><br/></p>
+                    </div>
+                
+            </div>
+            
+            <div id="calendar"/>
+            
+        </apex:form>
+
+    </apex:outputPanel>
+
+</body>
+</html>
+</apex:page>
